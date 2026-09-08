@@ -1,0 +1,140 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+out/
+.next/
+.nuxt/
+
+# Environment variables (CRITICAL for security!)
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+*.env
+
+# MongoDB data (if using local MongoDB)
+data/
+db/
+*.mongodb
+
+# JWT secrets and certificates (Security!)
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+certificates/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editor directories and files
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Testing coverage
+coverage/
+.nyc_output/
+*.test.js
+*.spec.js
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab/
+.azure/
+.jenkins/
+
+# Uploads/user files (if your app handles file uploads)
+uploads/
+public/uploads/
+media/
+*.zip
+*.rar
+
+# Database migration files (if not needed in repo)
+migrations/*.sql
+
+# Debug files
+debug.log
+error.log
+*.pid
+*.seed
+
+# IDE specific
+.vscode/
+.idea/
+*.iml
+
+# npm
+.npm/
+.npmrc
+
+# yarn
+.yarn/
+.yarnrc
+
+# Environment configs (except sample)
+!.env.example
+!.env.sample
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# OS specific
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Your specific app files (add if needed)
+# backend/uploads/
+# backend/public/temp/
