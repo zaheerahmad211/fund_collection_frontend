@@ -1,5 +1,11 @@
-```jsx
-import React, { createContext, useState, useContext, useEffect } from 'react';
+
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+} from 'react';
+
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -7,29 +13,44 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 // Backend API URL
+// Frontend .env:
+// VITE_API_URL=https://fundcollectionbackend.vercel.app/api
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
 
+  const [loading, setLoading] = useState(true);
+
+  const [token, setToken] = useState(
+    localStorage.getItem('token')
+  );
+
+  // Load user when token exists
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['x-auth-token'] = token;
+
       loadUser();
     } else {
       setLoading(false);
     }
   }, [token]);
 
-  // Load logged-in user
+  // Get logged-in user
   const loadUser = async () => {
     try {
-      const res = await axios.get(`${API_URL}/auth/me`);
+      const res = await axios.get(
+        `${API_URL}/auth/me`
+      );
+
       setUser(res.data);
     } catch (err) {
-      console.error('Error loading user:', err);
+      console.error(
+        'Error loading user:',
+        err
+      );
+
       logout();
     } finally {
       setLoading(false);
@@ -39,17 +60,23 @@ export const AuthProvider = ({ children }) => {
   // Login
   const login = async (email, password) => {
     try {
-      const res = await axios.post(`${API_URL}/auth/login`, {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        `${API_URL}/auth/login`,
+        {
+          email,
+          password,
+        }
+      );
 
       const { token, user } = res.data;
 
+      // Save token
       localStorage.setItem('token', token);
 
+      // Set authentication header
       axios.defaults.headers.common['x-auth-token'] = token;
 
+      // Update state
       setToken(token);
       setUser(user);
 
@@ -57,11 +84,16 @@ export const AuthProvider = ({ children }) => {
         success: true,
       };
     } catch (err) {
-      console.error('Login error:', err);
+      console.error(
+        'Login error:',
+        err
+      );
 
       return {
         success: false,
-        message: err.response?.data?.message || 'Login failed',
+        message:
+          err.response?.data?.message ||
+          'Login failed',
       };
     }
   };
@@ -70,7 +102,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
 
-    delete axios.defaults.headers.common['x-auth-token'];
+    delete axios.defaults.headers.common[
+      'x-auth-token'
+    ];
 
     setToken(null);
     setUser(null);
@@ -91,4 +125,6 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-```
+
+export default AuthContext;
+
