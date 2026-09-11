@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import Records from './pages/Records.jsx';
 import MonthlySheet from './pages/MonthlySheet.jsx';
 import AdminPanel from './pages/AdminPanel.jsx';
+import PendingPayments from './pages/PendingPayments.jsx';
 import Layout from './components/Layout.jsx';
 
 const theme = createTheme({
@@ -87,6 +88,7 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="records" element={<Records />} />
               <Route path="monthly-sheet" element={<MonthlySheet />} />
+              <Route path="pending-payments" element={<PendingPayments />} />
               <Route path="admin" element={
                 <AdminRoute>
                   <AdminPanel />

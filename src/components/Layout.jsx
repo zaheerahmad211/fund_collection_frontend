@@ -27,6 +27,7 @@ import {
   Logout,
   Person,
   AttachMoney,
+  HourglassEmpty,
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -55,6 +56,7 @@ const Layout = () => {
     { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
     { text: 'Records', icon: <Receipt />, path: '/records' },
     { text: 'Monthly Sheet', icon: <TableChart />, path: '/monthly-sheet' },
+    { text: 'Pending Payments', icon: <HourglassEmpty />, path: '/pending-payments' },
   ];
 
   if (isAdmin) {

@@ -12,10 +12,13 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-// Backend API URL
-// Frontend .env:
-// VITE_API_URL=https://fundcollectionbackend.vercel.app/api
-const API_URL = import.meta.env.VITE_API_URL;
+// Backend API URL — set as axios default so all relative /api/* calls work in production
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
+// Set axios base URL globally so all axios.get('/api/...') calls resolve correctly in production
+axios.defaults.baseURL = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace('/api', '')
+  : '';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -44,7 +47,8 @@ export const AuthProvider = ({ children }) => {
         `${API_URL}/auth/me`
       );
 
-      setUser(res.data);
+      // API returns { success: true, user: {...} } — extract the user object
+      setUser(res.data.user || res.data);
     } catch (err) {
       console.error(
         'Error loading user:',
