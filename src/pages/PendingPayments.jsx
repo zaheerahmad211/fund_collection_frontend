@@ -49,9 +49,13 @@ import {
   People,
   Warning,
   Group,
+  PictureAsPdf,
+  FileDownload,
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext.jsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -107,7 +111,7 @@ const PendingPayments = () => {
     try {
       setLoadingPending(true);
       const res = await axios.get(
-        `/api/records/pending`
+        `/api/records/pending?month=${selectedMonth}&year=${selectedYear}`
       );
       setPendingData(res.data);
     } catch (err) {
@@ -210,6 +214,49 @@ const PendingPayments = () => {
     }
   };
 
+  // ==================== EXPORT PDF ====================
+  const exportToPDF = () => {
+    if (!pendingData || pendingData.pendingMembers.length === 0) {
+      showSnackbar('No pending members to export', 'warning');
+      return;
+    }
+
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      doc.setFontSize(18);
+      doc.setTextColor(25, 118, 210);
+      doc.text(`Pending Payments - ${selectedMonth} ${selectedYear}`, pageWidth / 2, 20, { align: 'center' });
+      
+      doc.setFontSize(12);
+      doc.setTextColor(80);
+      doc.text(`Total Pending: ${pendingData.pendingCount}`, pageWidth / 2, 30, { align: 'center' });
+      
+      const tableHeaders = ['#', 'Name', 'Status'];
+      const tableRows = pendingData.pendingMembers.map((member, index) => [
+        index + 1,
+        member.name,
+        'Pending'
+      ]);
+
+      autoTable(doc, {
+        head: [tableHeaders],
+        body: tableRows,
+        startY: 40,
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [244, 67, 54], textColor: [255, 255, 255], fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [255, 235, 238] },
+      });
+
+      doc.save(`pending_payments_${selectedMonth}_${selectedYear}.pdf`);
+      showSnackbar('PDF exported successfully!', 'success');
+    } catch (err) {
+      console.error('Error exporting PDF:', err);
+      showSnackbar('Failed to export PDF', 'error');
+    }
+  };
+
   // ==================== RENDER ====================
   const pendingCount = pendingData?.pendingCount || 0;
   const paidCount = pendingData?.paidCount || 0;
@@ -276,6 +323,9 @@ const PendingPayments = () => {
             </FormControl>
             <Button variant="outlined" startIcon={<Refresh />} onClick={fetchPendingData} size="small">
               Refresh
+            </Button>
+            <Button variant="outlined" startIcon={<PictureAsPdf />} onClick={exportToPDF} size="small" color="error">
+              Export PDF
             </Button>
           </Box>
 

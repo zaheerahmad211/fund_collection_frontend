@@ -59,7 +59,7 @@ const recordSchema = yup.object().shape({
   month: yup.string().required('Month is required'),
   year: yup.number().required('Year is required'),
   date: yup.string().required('Date is required'),
-  description: yup.string(),
+  status: yup.string().oneOf(['Received', 'Pending']).required('Status is required'),
 });
 
 const MonthlySheet = () => {
@@ -86,7 +86,7 @@ const MonthlySheet = () => {
       month: new Date().toLocaleString('default', { month: 'long' }),
       year: new Date().getFullYear(),
       date: new Date().toISOString().split('T')[0],
-      description: '',
+      status: 'Received',
     },
   });
 
@@ -142,7 +142,7 @@ const MonthlySheet = () => {
       month: record.month,
       year: record.year,
       date: new Date(record.date).toISOString().split('T')[0],
-      description: record.description || '',
+      status: record.status || 'Received',
     });
   };
 
@@ -236,7 +236,7 @@ const MonthlySheet = () => {
       doc.text(summaryText, pageWidth / 2, 37, { align: 'center' });
       
       // Table headers
-      const tableHeaders = ['#', 'Name', 'Amount (PKR)', 'Month', 'Year', 'Date', 'Description'];
+      const tableHeaders = ['#', 'Name', 'Amount (PKR)', 'Month', 'Year', 'Date', 'Status'];
       const tableRows = records.map((record, index) => [
         index + 1,
         record.name,
@@ -244,7 +244,7 @@ const MonthlySheet = () => {
         record.month,
         record.year,
         new Date(record.date).toLocaleDateString(),
-        record.description || '-'
+        record.status || 'Received'
       ]);
 
       // Add total row
@@ -301,14 +301,14 @@ const MonthlySheet = () => {
       return;
     }
     try {
-      const headers = ['Name', 'Amount (PKR)', 'Month', 'Year', 'Date', 'Description'];
+      const headers = ['Name', 'Amount (PKR)', 'Month', 'Year', 'Date', 'Status'];
       const csvData = records.map(r => [
         r.name, 
         `PKR ${r.amount.toFixed(2)}`,  // Fixed: PKR prefix
         r.month, 
         r.year, 
         new Date(r.date).toLocaleDateString(), 
-        r.description || ''
+        r.status || 'Received'
       ]);
       const csvContent = [headers.join(','), ...csvData.map(row => row.join(','))].join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -459,7 +459,7 @@ const MonthlySheet = () => {
               <TableCell sx={{ color: 'white', fontWeight: 600 }}>Month</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 600 }}>Year</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 600 }}>Date</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 600 }}>Description</TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 600 }}>Status</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 600 }}>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -558,16 +558,17 @@ const MonthlySheet = () => {
 
                     <TableCell>
                       {isEditing ? (
-                        <TextField 
-                          size="small" 
-                          value={editData.description || ''} 
-                          onChange={(e) => handleEditChange('description', e.target.value)} 
-                          fullWidth 
-                          variant="outlined" 
-                          sx={{ minWidth: 120 }} 
-                        />
+                        <FormControl size="small" fullWidth sx={{ minWidth: 120 }}>
+                          <Select 
+                            value={editData.status || 'Received'} 
+                            onChange={(e) => handleEditChange('status', e.target.value)}
+                          >
+                            <MenuItem value="Received">Received</MenuItem>
+                            <MenuItem value="Pending">Pending</MenuItem>
+                          </Select>
+                        </FormControl>
                       ) : (
-                        record.description || '-'
+                        record.status || 'Received'
                       )}
                     </TableCell>
 
@@ -701,16 +702,16 @@ const MonthlySheet = () => {
                 )} 
               />
               <Controller 
-                name="description" 
+                name="status" 
                 control={control} 
                 render={({ field }) => (
-                  <TextField 
-                    {...field} 
-                    fullWidth 
-                    label="Description" 
-                    multiline 
-                    rows={2} 
-                  />
+                  <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel>Status</InputLabel>
+                    <Select {...field} label="Status">
+                      <MenuItem value="Received">Received</MenuItem>
+                      <MenuItem value="Pending">Pending</MenuItem>
+                    </Select>
+                  </FormControl>
                 )} 
               />
             </Box>

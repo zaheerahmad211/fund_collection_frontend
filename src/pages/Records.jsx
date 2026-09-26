@@ -26,7 +26,7 @@ const recordSchema = yup.object().shape({
   month: yup.string().required('Month is required'),
   year: yup.number().required('Year is required'),
   date: yup.string().required('Date is required'),
-  description: yup.string(),
+  status: yup.string().oneOf(['Received', 'Pending']).required('Status is required'),
 });
 
 const Records = () => {
@@ -58,7 +58,7 @@ const Records = () => {
       month: new Date().toLocaleString('default', { month: 'long' }),
       year: new Date().getFullYear(),
       date: new Date().toISOString().split('T')[0],
-      description: '',
+      status: 'Received',
     },
   });
 
@@ -155,7 +155,7 @@ const Records = () => {
         month: record.month,
         year: record.year,
         date: new Date(record.date).toISOString().split('T')[0],
-        description: record.description || '',
+        status: record.status || 'Received',
       });
     } else {
       setEditingRecord(null);
@@ -165,7 +165,7 @@ const Records = () => {
         month: filters.month,
         year: filters.year,
         date: new Date().toISOString().split('T')[0],
-        description: '',
+        status: 'Received',
       });
     }
     setOpenDialog(true);
@@ -259,7 +259,7 @@ const Records = () => {
       doc.text(summaryText, pageWidth / 2, 37, { align: 'center' });
       
       // Table headers
-      const tableHeaders = ['#', 'Name', 'Amount (PKR)', 'Month', 'Year', 'Date', 'Description'];
+      const tableHeaders = ['#', 'Name', 'Amount (PKR)', 'Month', 'Year', 'Date', 'Status'];
       const tableRows = records.map((record, index) => [
         index + 1,
         record.name,
@@ -267,7 +267,7 @@ const Records = () => {
         record.month,
         record.year,
         new Date(record.date).toLocaleDateString(),
-        record.description || '-'
+        record.status || 'Received'
       ]);
 
       autoTable(doc, {
@@ -314,14 +314,14 @@ const Records = () => {
     }
 
     try {
-      const headers = ['Name', 'Amount (PKR)', 'Month', 'Year', 'Date', 'Description'];
+      const headers = ['Name', 'Amount (PKR)', 'Month', 'Year', 'Date', 'Status'];
       const csvData = records.map(r => [
         r.name,
         `PKR ${r.amount.toFixed(2)}`,  // Fixed: PKR prefix
         r.month,
         r.year,
         new Date(r.date).toLocaleDateString(),
-        r.description || ''
+        r.status || 'Received'
       ]);
       
       const csvContent = [
@@ -565,7 +565,7 @@ const Records = () => {
               <TableCell sx={{ color: 'white', fontWeight: 600 }}>Month</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 600 }}>Year</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 600 }}>Date</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 600 }}>Description</TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 600 }}>Status</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 600 }}>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -581,7 +581,7 @@ const Records = () => {
                   <TableCell>{record.month}</TableCell>
                   <TableCell>{record.year}</TableCell>
                   <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
-                  <TableCell>{record.description || '-'}</TableCell>
+                  <TableCell>{record.status || 'Received'}</TableCell>
                   <TableCell>
                     <Tooltip title="Edit">
                       <IconButton size="small" color="primary" onClick={() => handleOpenDialog(record)}>
@@ -637,8 +637,14 @@ const Records = () => {
               <Controller name="date" control={control} render={({ field }) => (
                 <TextField {...field} fullWidth label="Date" type="date" sx={{ mt: 2, mb: 2 }} InputLabelProps={{ shrink: true }} error={!!errors.date} helperText={errors.date?.message} />
               )} />
-              <Controller name="description" control={control} render={({ field }) => (
-                <TextField {...field} fullWidth label="Description" multiline rows={2} />
+              <Controller name="status" control={control} render={({ field }) => (
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <InputLabel>Status</InputLabel>
+                  <Select {...field} label="Status">
+                    <MenuItem value="Received">Received</MenuItem>
+                    <MenuItem value="Pending">Pending</MenuItem>
+                  </Select>
+                </FormControl>
               )} />
             </Box>
           </DialogContent>
